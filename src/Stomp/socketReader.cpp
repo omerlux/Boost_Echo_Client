@@ -12,10 +12,10 @@ void socketReader:: run(){
     //------------------- start edit 10/1 ------------------------
     std::string income;
     while (!logout){
-        getline(std::cin,input);
-        if (input.compare("logout"))
-            logout=true;
-        connectionHandler.getLine(input);       /// THIS IS NOT A LINE, ITS A MESSAGE
+    //    getline(std::cin,input);
+    //    if (input.compare("logout"))
+    //        logout=true;
+    //    connectionHandler.getLine(input);       /// THIS IS NOT A LINE, ITS A MESSAGE
     }
     //------------------- end edit 10/1 --------------------------
 }

@@ -15,7 +15,6 @@ void keyboardInputSend:: run(){
         getline(std::cin,input);
         if (input.compare("logout"))
             logout=true;
-        if()
         connectionHandler.sendLine(input);
     }
     //------------------- end edit 10/1 --------------------------

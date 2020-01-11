@@ -14,12 +14,12 @@ void keyboardInputSend:: run(){
     while (!logout){
         getline(std::cin,input);            //reading from keyboard
         CH.stompSendProcess(input);
-
-        if (input.compare("logout"))
+        input = "";
+     /*   if (input.compare("logout"))
             logout=true;            ///to stop writing
 
 
-        //CH.sendLine(input);     //need to convert input to a FRAME
+        //CH.sendLine(input);     //need to convert input to a FRAME */
     }
     //------------------- end edit 11/1 --------------------------
 }

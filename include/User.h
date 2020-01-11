@@ -32,7 +32,7 @@ public:
 
     //Getters
     unordered_map<string,int> &get_topic_idByClient_map ();
-    unordered_map<int,bool> &get_receiptId_returned_map();
+    unordered_map<int,string> &get_receiptId_returned_map();
     vector <Book*> &getInventory();
     std::string getName();
 

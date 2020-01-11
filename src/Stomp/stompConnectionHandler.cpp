@@ -122,7 +122,6 @@ void stompConnectionHandler::close() {
 // stompSendProcess
 void stompConnectionHandler::stompSendProcess(std::string &input) {
     //------------------- start edit 11/1 ------------------------
-    // string first_word = input.substr(0,input.find(" "));
     std::vector <string> inputBySpace ;
     std::string delimiter = " ";
 
@@ -266,12 +265,49 @@ void stompConnectionHandler::stompSendProcess(std::string &input) {
         sendFrame(frame);
     }
 
+
 //------------------- end edit 11/1 --------------------------
 }
 
 
+void stompConnectionHandler::stompReceivedProcess(std::string &income) {
+    //------------------- start edit 11/1 ------------------------
+    std::vector <string> inputByLine ;
+    std::string delimiter = "\n";
+
+    //Parsing the string
+    size_t pos = 0;
+    std::string token;
+    while ((pos = income.find(delimiter)) != std::string::npos) {
+        token = income.substr(0, pos);
+        inputByLine.push_back(token);
+        income.erase(0, pos + delimiter.length());
+    }
+    inputByLine.push_back(income);
+    std::string first_word = inputByLine[0];
+
+    ///------------------------CONNECTED received----------------------------------------------------
+    if (first_word == "CONNECTED"){
+        std::cout<< "Login successful";
+
+    ///------------------------RECEIPT received----------------------------------------------------
+    }else if (first_word=="RECEIPT") {
+        size_t pos = income.find(":");
+        std::string receiptNum = inputByLine[1].substr(pos+1, inputByLine[1].length()-1);
+        string s 
+
+    ///------------------------MESSAGE received----------------------------------------------------
+    }else if (first_word=="MESSAGE") {
+
+    ///------------------------ERROR received----------------------------------------------------
+    }else if (first_word=="ERROR"){
+
+    }
 
 
+    //------------------- end edit 11/1 --------------------------
+
+}
 
 
 

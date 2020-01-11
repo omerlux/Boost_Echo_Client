@@ -60,7 +60,10 @@ public:
     void stompSendProcess(std::string &input);
     //------------------- end edit 11/1 --------------------------
 
-
+    //------------------- start edit 11/1 ------------------------
+    // stompSendProcess - Receive a frame from server and act
+    void stompReceivedProcess(std::string &income);
+    //------------------- end edit 11/1 --------------------------
 }; //class ConnectionHandler
 
 

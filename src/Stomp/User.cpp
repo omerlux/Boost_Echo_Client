@@ -17,7 +17,7 @@ User::~User(){
 
 unordered_map<string, int> &User::get_topic_idByClient_map() { return topic_idByClient_map;}
 
-unordered_map<int, bool> &User::get_receiptId_returned_map() { return receiptId_returned_map;}
+unordered_map<int, string> &User::get_receiptId_returned_map() { return receiptId_returned_map;}
 
 vector<Book*> & User::getInventory() { return inventory;}
 

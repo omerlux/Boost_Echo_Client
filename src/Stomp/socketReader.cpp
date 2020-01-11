@@ -12,7 +12,7 @@ void socketReader:: run(){
     //------------------- start edit 11/1 ------------------------
     std::string income;
     while (!logout){
-        CH.getFrame(income);                              //returns a FRAME of string
+        CH.getFrame(income);//returns a FRAME of string
         if(income.find("ERROR")!=std::string::npos) {     //FORUM: close the connection
             logout=true;
         }

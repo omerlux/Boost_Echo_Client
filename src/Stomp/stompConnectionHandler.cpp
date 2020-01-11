@@ -166,7 +166,7 @@ void stompConnectionHandler::stompSendProcess(std::string &input) {
     }else if(first_word == "join"){
         string topic = inputBySpace[1];                                     // [1] is the topic name
         int topicId = user->subTopic(topic);
-        int receiptId = user->addReceiptId("join");
+        int receiptId = user->addReceiptId("join "+topic);
 
         std::stringstream ss2;
         ss2 << "SUBSCRIBE\n" <<
@@ -182,7 +182,7 @@ void stompConnectionHandler::stompSendProcess(std::string &input) {
         string topic = inputBySpace[1];                                     // [1] is the topic name
         int topicId = user->unsubtopic(topic);                       // changing the database of the topic
         if(topicId != -1){
-            int receiptId = user->addReceiptId("exit");
+            int receiptId = user->addReceiptId("exit "+topic);
 
             std::stringstream ss2;
             ss2 << "UNSUBSCRIBE\n" <<
@@ -293,8 +293,25 @@ void stompConnectionHandler::stompReceivedProcess(std::string &income) {
     ///------------------------RECEIPT received----------------------------------------------------
     }else if (first_word=="RECEIPT") {
         size_t pos = income.find(":");
-        std::string receiptNum = inputByLine[1].substr(pos+1, inputByLine[1].length()-1);
-        string s 
+        string receiptId_str = inputByLine[1].substr(pos+1, inputByLine[1].length()-1);
+        string msg_receipt = user->receiptStatus(stoi(receiptId_str));
+        //Check if this receipt is for join command
+        if (msg_receipt.find("join")!=std::string::npos){
+            pos = msg_receipt.find(" ");
+            std::cout << "Joined club "+ msg_receipt.substr(pos+1,msg_receipt.length()-1);
+        }
+        //Check if this receipt is for unsubscribe command
+        else if (msg_receipt == "exit"){
+            pos = msg_receipt.find(" ");
+            int unsub = user->unsubtopic(msg_receipt.substr(pos+1,msg_receipt.length()-1));
+            if (unsub==-1)      //The user already unsubscribe when we sent the msg, so the function will return -1
+                std::cout << "Exited club "+ msg_receipt.substr(pos+1,msg_receipt.length()-1);
+        }
+        //Check if this receipt is for logout command
+        else if (msg_receipt == "logout"){
+
+        }
+
 
     ///------------------------MESSAGE received----------------------------------------------------
     }else if (first_word=="MESSAGE") {

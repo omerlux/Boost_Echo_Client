@@ -3,19 +3,23 @@
 //
 
 #include "keyboardInputSend.h"
-#include "connectionHandler.h"
+#include "stompConnectionHandler.h"
 
-keyboardInputSend::keyboardInputSend(ConnectionHandler &connectionHandler, bool &logout):
-                    connectionHandler(connectionHandler),logout(logout) {}
+keyboardInputSend::keyboardInputSend(stompConnectionHandler &CH, bool &logout):
+                    CH(CH),logout(logout) {}
 
 void keyboardInputSend:: run(){
-    //------------------- start edit 10/1 ------------------------
+    //------------------- start edit 11/1 ------------------------
     std::string input;
     while (!logout){
-        getline(std::cin,input);
+        getline(std::cin,input);            //reading from keyboard
+        CH.stompSendProcess(input);
+
         if (input.compare("logout"))
-            logout=true;
-        connectionHandler.sendLine(input);
+            logout=true;            ///to stop writing
+
+
+        //CH.sendLine(input);     //need to convert input to a FRAME
     }
-    //------------------- end edit 10/1 --------------------------
+    //------------------- end edit 11/1 --------------------------
 }

@@ -15,6 +15,7 @@ using std::unordered_map;
 class User {
 private:
     //------------------- start edit 10/1 ------------------------
+    std::string name;
     vector <Book*> inventory;
     unordered_map <string, int> topic_idByClient_map;
     unordered_map <int, bool> receiptId_returned_map;
@@ -33,6 +34,10 @@ public:
     unordered_map<string,int> &get_topic_idByClient_map ();
     unordered_map<int,bool> &get_receiptId_returned_map();
     vector <Book*> &getInventory();
+    std::string getName();
+
+    //SetName
+    void setName(std::string name);
 
     //adders
     void addBook(Book *book);

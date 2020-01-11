@@ -6,7 +6,7 @@
 #include "Book.h"
 #include "User.h"
 //------------------- start edit 11/1 ------------------------
-User::User(): inventory(), topic_idByClient_map(),receiptId_returned_map(), topicIdCounter(1), receiptIdCounter(1){};
+User::User(): name(),inventory(), topic_idByClient_map(),receiptId_returned_map(), topicIdCounter(1), receiptIdCounter(1){};
 
 User::~User(){
     for( Book *b:inventory){
@@ -19,6 +19,10 @@ unordered_map<string, int> &User::get_topic_idByClient_map() { return topic_idBy
 unordered_map<int, bool> &User::get_receiptId_returned_map() { return receiptId_returned_map;}
 
 vector<Book*> & User::getInventory() { return inventory;}
+
+std::string User::getName() { return name;}
+
+void User::setName(std::string name) { this->name=name;}
 
 //adding a book to the inventory
 void User::addBook(Book *book) {inventory.push_back(book);}

@@ -3,19 +3,21 @@
 //
 
 #include "socketReader.h"
-#include "connectionHandler.h"
+#include "stompConnectionHandler.h"
 
-socketReader::socketReader(ConnectionHandler &connectionHandler, bool &logout):
-                connectionHandler(connectionHandler),logout(logout){}
+socketReader::socketReader(stompConnectionHandler &CH, bool &logout):
+        CH(CH),logout(logout){}
 
 void socketReader:: run(){
-    //------------------- start edit 10/1 ------------------------
+    //------------------- start edit 11/1 ------------------------
     std::string income;
     while (!logout){
-    //    getline(std::cin,input);
-    //    if (input.compare("logout"))
-    //        logout=true;
-    //    connectionHandler.getLine(input);       /// THIS IS NOT A LINE, ITS A MESSAGE
+        CH.getFrame(income);                              //returns a FRAME of string
+        if(income.find("ERROR")!=std::string::npos) {     //FORUM: close the connection
+            logout=true;
+        }
+        ///CH.stompReceiveProcces.process(income)
+
     }
-    //------------------- end edit 10/1 --------------------------
+    //------------------- end edit 11/1 --------------------------
 }

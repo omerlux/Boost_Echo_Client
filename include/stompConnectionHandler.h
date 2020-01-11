@@ -7,23 +7,26 @@
 
 #include <string>
 #include <iostream>
+#include "User.h"
 #include <boost/asio.hpp>
 
 using boost::asio::ip::tcp;
 
 class stompConnectionHandler {
 private:
-    const std::string host_;
-    const short port_;
+    std::string host_;
+    short port_;
     boost::asio::io_service io_service_;   // Provides core I/O functionality
     tcp::socket socket_;
+    User* user;
+    bool registered;
 
 public:
-    stompConnectionHandler(std::string host, short port);
+    stompConnectionHandler(std::string host, short port, User* user);
     virtual ~stompConnectionHandler();
 
     // Connect to the remote machine
-    bool connect();
+    bool connect(std::string host, short port);
 
     // Read a fixed number of bytes from the server - blocking.
     // Returns false in case the connection is closed before bytesToRead bytes can be read.
@@ -35,11 +38,11 @@ public:
 
     // Read an ascii line from the server
     // Returns false in case connection closed before a newline can be read.
-    bool getLine(std::string& line);
+    bool getFrame(std::string& line);
 
     // Send an ascii line from the server
     // Returns false in case connection closed before all the data is sent.
-    bool sendLine(std::string& line);
+    bool sendFrame(std::string& line);
 
     // Get Ascii data from the server until the delimiter character
     // Returns false in case connection closed before null can be read.
@@ -51,6 +54,12 @@ public:
 
     // Close down the connection properly.
     void close();
+
+    //------------------- start edit 11/1 ------------------------
+    // stompSendProcess - make a frame and send it to the server
+    void stompSendProcess(std::string &input);
+    //------------------- end edit 11/1 --------------------------
+
 
 }; //class ConnectionHandler
 

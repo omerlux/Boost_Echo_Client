@@ -4,18 +4,18 @@
 
 #ifndef BOOST_ECHO_CLIENT_SOCKETREADER_H
 #define BOOST_ECHO_CLIENT_SOCKETREADER_H
-#include "connectionHandler.h"
+#include "stompConnectionHandler.h"
 
 class socketReader {
 private:
     //------------------- start edit 10/1 ------------------------
     bool &logout;
-    ConnectionHandler &connectionHandler;
+    stompConnectionHandler &CH;
     //------------------- end edit 10/1 --------------------------
 
 public:
     //------------------- start edit 10/1 ------------------------
-    socketReader (ConnectionHandler &connectionHandler, bool &logout);
+    socketReader (stompConnectionHandler &CH, bool &logout);
     void run();
     //------------------- end edit 10/1 --------------------------
 };

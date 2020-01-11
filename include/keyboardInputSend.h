@@ -4,18 +4,18 @@
 
 #ifndef BOOST_ECHO_CLIENT_KEYBOARDINPUTSEND_H
 #define BOOST_ECHO_CLIENT_KEYBOARDINPUTSEND_H
-#include "connectionHandler.h"
+#include "stompConnectionHandler.h"
 
 class keyboardInputSend {
 private:
     //------------------- start edit 10/1 ------------------------
     bool &logout;
-    ConnectionHandler &connectionHandler;
+    stompConnectionHandler &CH;
     //------------------- end edit 10/1 --------------------------
 
 public:
     //------------------- start edit 10/1 ------------------------
-    keyboardInputSend (ConnectionHandler &connectionHandler, bool &logout);
+    keyboardInputSend (stompConnectionHandler &CH, bool &logout);
     void run();
     //------------------- end edit 10/1 --------------------------
 };

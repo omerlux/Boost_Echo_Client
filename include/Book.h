@@ -14,6 +14,7 @@ private:
     string bookname;
     string topic;
     string loner;
+    bool inMyInventory;
     //------------------- end edit 10/1 --------------------------
 
 public:
@@ -27,9 +28,11 @@ public:
     string getBookname();
     string getTopic();
     string getLoner();
+    bool getInMyInventory();
 
     //Setter
     void setLoner(string &loner);
+    void setInMyInventory(bool state);
     //------------------- end edit 10/1 --------------------------
 
 };

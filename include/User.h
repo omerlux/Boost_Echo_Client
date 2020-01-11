@@ -18,7 +18,7 @@ private:
     std::string name;
     vector <Book*> inventory;
     unordered_map <string, int> topic_idByClient_map;
-    unordered_map <int, bool> receiptId_returned_map;
+    unordered_map <int, string> receiptId_returned_map;
     int topicIdCounter;
     int receiptIdCounter;
     //------------------- end edit 10/1 --------------------------
@@ -48,9 +48,9 @@ public:
 
 
     //receipt
-    int addReceiptId();
+    int addReceiptId(string details);
     void returnedReceiptId(int receiptId);
-    bool receiptStatus (int receiptId);
+    string receiptStatus (int receiptId);
     //------------------- end edit 10/1 --------------------------
 };
 

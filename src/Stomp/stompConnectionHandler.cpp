@@ -14,7 +14,7 @@ using std::cerr;
 using std::endl;
 using std::string;
 
-stompConnectionHandler::stompConnectionHandler(string host, short port, User* user): host_(host), port_(port), io_service_(), socket_(io_service_), user(user), registered(false){}
+stompConnectionHandler::stompConnectionHandler(string host, short port, User* user): host_(host), port_(port), io_service_(), socket_(io_service_), user(user){}
 
 stompConnectionHandler::~stompConnectionHandler() {
     close();
@@ -167,7 +167,7 @@ void stompConnectionHandler::stompSendProcess(std::string &input) {
     }else if(first_word == "join"){
         string topic = inputBySpace[1];                                     // [1] is the topic name
         int topicId = user->subTopic(topic);
-        int receiptId = user->addReceiptId();
+        int receiptId = user->addReceiptId("join");
 
         std::stringstream ss2;
         ss2 << "SUBSCRIBE\n" <<
@@ -176,6 +176,23 @@ void stompConnectionHandler::stompSendProcess(std::string &input) {
            "receipt:"+std::to_string(receiptId)+"\n\n^@";
         std::string frame = ss2.str();
         sendFrame(frame);
+
+
+        ///------------------------Exit send----------------------------------------------------
+    }else if(first_word == "exit"){
+        string topic = inputBySpace[1];                                     // [1] is the topic name
+        int topicId = user->unsubtopic(topic);                       // changing the database of the topic
+        if(topicId != -1){
+            int receiptId = user->addReceiptId("exit");
+
+            std::stringstream ss2;
+            ss2 << "UNSUBSCRIBE\n" <<
+                "id:"+std::to_string(topicId)+"\n" <<
+                "receipt:"+std::to_string(receiptId)+"\n\n^@";
+            std::string frame = ss2.str();
+            sendFrame(frame);
+        }
+
 
         ///------------------------Add send----------------------------------------------------
     }else if(first_word == "add"){
@@ -234,12 +251,19 @@ void stompConnectionHandler::stompSendProcess(std::string &input) {
         sendFrame(frame);
 
         ///------------------------Logout send----------------------------------------------------
-    }else if(first_word == "logout"){
+    }else if(first_word == "logout") {
+        //registered=false;
+        //delete user;
+        //user= new User();           // removing all the parameters of the user
+        /// ^^^^ those 3 will be on received receipt.
 
+        int receiptId = user->addReceiptId("logout");
 
-        ///------------------------Exit send----------------------------------------------------
-    }else if(first_word == "exit"){
-    ///Logout and change flag to EXIT the program
+        std::stringstream ss;
+        ss << "DISCONNECT\n" <<
+           "receipt:" + std::to_string(receiptId) + "\n\n^@";
+        std::string frame = ss.str();
+        sendFrame(frame);
     }
 
 //------------------- end edit 11/1 --------------------------

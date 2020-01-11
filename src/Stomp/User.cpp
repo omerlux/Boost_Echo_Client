@@ -6,7 +6,8 @@
 #include "Book.h"
 #include "User.h"
 //------------------- start edit 11/1 ------------------------
-User::User(): name(),inventory(), topic_idByClient_map(),receiptId_returned_map(), topicIdCounter(1), receiptIdCounter(1){};
+User::User(): name(),inventory(), topic_idByClient_map(),receiptId_returned_map(),
+topicIdCounter(1), receiptIdCounter(1){};
 
 User::~User(){
     for( Book *b:inventory){
@@ -62,24 +63,24 @@ int User::unsubtopic(string topic) {
 
 ///Receipts functions
 //returning the receiptId that has been added to the map, with
-int User::addReceiptId()  {
+int User::addReceiptId(string details)  {
     //------------------- start edit 11/1 ------------------------
-    std::pair<int,bool> tmp_pair (receiptIdCounter, false);     //this will be a new receipt
+    std::pair<int,string> tmp_pair (receiptIdCounter, details);     //this will be a new receipt
     receiptId_returned_map.insert(tmp_pair);
     receiptIdCounter++;
     return receiptIdCounter-1;
     //------------------- end edit 11/1 --------------------------
 }
 
-//setting the receiptId to true, means that it has returned fromt he server
+// removing the receiptId from the map if it has been returned
 void User::returnedReceiptId(int receiptId) {
     //------------------- start edit 11/1 ------------------------
-    receiptId_returned_map.find(receiptId)->second=true;               //setting the receipt Id to true
+    receiptId_returned_map.erase(receiptId_returned_map.find(receiptId));     //deleting this receiptId
     //------------------- end edit 11/1 --------------------------
 }
 
 //checking the status of a specific receiptId
-bool User::receiptStatus(int receiptId) {
+string User::receiptStatus(int receiptId) {
     //------------------- start edit 11/1 ------------------------
     return receiptId_returned_map.find(receiptId)->second;
     //------------------- end edit 11/1 --------------------------

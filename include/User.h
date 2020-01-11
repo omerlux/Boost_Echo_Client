@@ -21,6 +21,7 @@ private:
     unordered_map <int, string> receiptId_returned_map;
     int topicIdCounter;
     int receiptIdCounter;
+    unordered_map <string,string>  askedBook_topic_map;
     //------------------- end edit 10/1 --------------------------
 
 public:
@@ -33,6 +34,7 @@ public:
     //Getters
     unordered_map<string,int> &get_topic_idByClient_map ();
     unordered_map<int,string> &get_receiptId_returned_map();
+    unordered_map<string,string> &get_askedBook_topic_map();
     vector <Book*> &getInventory();
     std::string getName();
 
@@ -41,6 +43,11 @@ public:
 
     //adders
     void addBook(Book *book);
+    void addAskedBook (string bookname, string topic);
+
+    //askedBook functions
+    void removeAskedBook(string bookname);
+    bool wasAskedForBook(string bookname);
 
     //topic
     int subTopic(string &topic);        //works as a getter for a topic as well!!

@@ -136,37 +136,36 @@ void stompConnectionHandler::stompSendProcess(std::string &input) {
     inputBySpace.push_back(input);
     std::string first_word = inputBySpace[0];
 
-        ///------------------------Login send----------------------------------------------------
+    ///------------------------Login send----------------------------------------------------
     if(first_word == "login"){
         size_t pos = input.find(":");
         std::string host = inputBySpace[1].substr(0,pos);
-        std::string port_str = inputBySpace[1].substr(pos+1, inputBySpace[1].length()-1);
+        std::string port_str = inputBySpace[1].substr(pos+1);
         short port = std::stoul (port_str,nullptr,0);
 
-        if(!connect(host, port)){
-            std::cerr<<"Cannot connect to " << host << ":" <<port << std::endl;
-        }
-        else{
-            if(registered==false){
-                registered =true;
-                user->setName(inputBySpace[2]);                         // [2] is the user name
+        if(registered==false){                                                //Check if we aren't already connected
+            if(!connect(host, port)){                                         //Check connection
+                std::cerr<<"Could not connect to server" << std::endl;
             }
-
-            std::stringstream ss;
-            ss << "CONNECT\n" <<
-               "accept-version:1.2\n" <<
-               "host:stomp.cs.bgu.ac.il\n" <<
-               "login:"+inputBySpace[2]+"\n" <<
-               "passcode:"+inputBySpace[3]+"\n\n^@";                            // [3] is the password
-            std::string frame = ss.str();
-            sendFrame(frame);
+            else {                                                           //If connection is good - GO!!!
+                registered = true;
+                user->setName(inputBySpace[2]);                         // [2] is the user name
+                std::stringstream ss;
+                ss << "CONNECT\n" <<
+                "accept-version:1.2\n" <<
+                "host:stomp.cs.bgu.ac.il\n" <<
+                "login:"+inputBySpace[2]+"\n" <<
+                "passcode:"+inputBySpace[3]+"\n\n^@";                            // [3] is the password
+                std::string frame = ss.str();
+                sendFrame(frame);
+            }
         }
 
-        ///------------------------Join send----------------------------------------------------
+    ///------------------------Join send----------------------------------------------------
     }else if(first_word == "join"){
         string topic = inputBySpace[1];                                     // [1] is the topic name
         int topicId = user->subTopic(topic);
-        int receiptId = user->addReceiptId("join "+topic);
+        int receiptId = user->addReceiptId("join "+topic);          //The user subscribe to topic
 
         std::stringstream ss2;
         ss2 << "SUBSCRIBE\n" <<
@@ -177,10 +176,10 @@ void stompConnectionHandler::stompSendProcess(std::string &input) {
         sendFrame(frame);
 
 
-        ///------------------------Exit send----------------------------------------------------
+    ///------------------------Exit send----------------------------------------------------
     }else if(first_word == "exit"){
         string topic = inputBySpace[1];                                     // [1] is the topic name
-        int topicId = user->unsubtopic(topic);                       // changing the database of the topic
+        int topicId = user->unsubtopic(topic);                            // changing the database of the topic
         if(topicId != -1){
             int receiptId = user->addReceiptId("exit "+topic);
 
@@ -193,9 +192,12 @@ void stompConnectionHandler::stompSendProcess(std::string &input) {
         }
 
 
-        ///------------------------Add send----------------------------------------------------
+    ///------------------------Add send----------------------------------------------------
     }else if(first_word == "add"){
-        Book* new_book = new Book(inputBySpace[2],inputBySpace[1],nullptr); //creating new book with no loners
+        string bookname = inputBySpace[2];
+        for (int i=3; i<inputBySpace.size();i++)
+            bookname += " "+inputBySpace[i];
+        Book* new_book = new Book(bookname,inputBySpace[1],nullptr); //creating new book with no loners
         user->addBook(new_book);
 
         std::stringstream ss;
@@ -206,21 +208,30 @@ void stompConnectionHandler::stompSendProcess(std::string &input) {
         std::string frame = ss.str();
         sendFrame(frame);
 
-        ///------------------------Borrow send----------------------------------------------------
+     ///------------------------Borrow send----------------------------------------------------
     }else if(first_word == "borrow"){
+        string bookname = inputBySpace[2];
+        for (int i=3; i<inputBySpace.size();i++)
+            bookname += " "+inputBySpace[i];
+        user->addAskedBook(bookname,inputBySpace[1]);                   // [1] is the topic name
+
         std::stringstream ss;
         ss << "SEND\n" <<
-            "destination:"+inputBySpace[1]+"\n" <<                              // [1] is the topic name
+            "destination:"+inputBySpace[1]+"\n" <<                            // [1] is the topic name
             "\n" <<
-            user->getName()+" wish to borrow "+inputBySpace[2]+"\n\n^@";        // [2] is the book name
+            user->getName()+" wish to borrow "+bookname+"\n\n^@";        // [2] is the book name
         std::string frame = ss.str();
         sendFrame(frame);
 
-        ///------------------------Return send----------------------------------------------------
+    ///------------------------Return send----------------------------------------------------
     }else if(first_word == "return"){
+        string bookname = inputBySpace[2];
+        for (int i=3; i<inputBySpace.size();i++)
+            bookname += " "+inputBySpace[i];
+
         string loner="";
         for(Book* book: user->getInventory()){                  // searching for the book we want to return
-            if(book->getBookname() == inputBySpace[2]) {        // [2] is the book name
+            if(book->getBookname() == bookname) {        // [2] is the book name
                 loner = book->getLoner();                       // if loner is real name, than we will delete the book and send the frame
                 if(loner != "") {
                     user->getInventory().erase(
@@ -231,7 +242,7 @@ void stompConnectionHandler::stompSendProcess(std::string &input) {
                     ss << "SEND\n" <<
                        "destination:" + inputBySpace[1] + "\n" <<
                        "\n" <<
-                       " returning " + inputBySpace[2] + " to " + loner + "\n\n^@";
+                       " returning " + bookname + " to " + loner + "\n\n^@";
                     std::string frame = ss.str();
                     sendFrame(frame);
                 }
@@ -239,7 +250,7 @@ void stompConnectionHandler::stompSendProcess(std::string &input) {
             }
         }
 
-        ///------------------------Status send----------------------------------------------------
+    ///------------------------Status send----------------------------------------------------
     }else if(first_word == "status"){
         std::stringstream ss;
         ss << "SEND\n" <<
@@ -249,13 +260,8 @@ void stompConnectionHandler::stompSendProcess(std::string &input) {
         std::string frame = ss.str();
         sendFrame(frame);
 
-        ///------------------------Logout send----------------------------------------------------
+     ///------------------------Logout send----------------------------------------------------
     }else if(first_word == "logout") {
-        //registered=false;
-        //delete user;
-        //user= new User();           // removing all the parameters of the user
-        /// ^^^^ those 3 will be on received receipt.
-
         int receiptId = user->addReceiptId("logout");
 
         std::stringstream ss;
@@ -265,11 +271,12 @@ void stompConnectionHandler::stompSendProcess(std::string &input) {
         sendFrame(frame);
     }
 
-
 //------------------- end edit 11/1 --------------------------
 }
 
 
+
+// stompReceivedProcess
 void stompConnectionHandler::stompReceivedProcess(std::string &income) {
     //------------------- start edit 11/1 ------------------------
     std::vector <string> inputByLine ;
@@ -286,39 +293,140 @@ void stompConnectionHandler::stompReceivedProcess(std::string &income) {
     inputByLine.push_back(income);
     std::string first_word = inputByLine[0];
 
-    ///------------------------CONNECTED received----------------------------------------------------
+    ///-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.CONNECTED received-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
     if (first_word == "CONNECTED"){
         std::cout<< "Login successful";
 
-    ///------------------------RECEIPT received----------------------------------------------------
+    ///-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.RECEIPT received-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
     }else if (first_word=="RECEIPT") {
         size_t pos = income.find(":");
-        string receiptId_str = inputByLine[1].substr(pos+1, inputByLine[1].length()-1);
+        string receiptId_str = inputByLine[1].substr(pos+1);
         string msg_receipt = user->receiptStatus(stoi(receiptId_str));
         //Check if this receipt is for join command
         if (msg_receipt.find("join")!=std::string::npos){
             pos = msg_receipt.find(" ");
-            std::cout << "Joined club "+ msg_receipt.substr(pos+1,msg_receipt.length()-1);
+            std::cout << "Joined club "+ msg_receipt.substr(pos+1);
         }
         //Check if this receipt is for unsubscribe command
-        else if (msg_receipt == "exit"){
+        else if (msg_receipt.find("exit")!=std::string::npos){
             pos = msg_receipt.find(" ");
-            int unsub = user->unsubtopic(msg_receipt.substr(pos+1,msg_receipt.length()-1));
-            if (unsub==-1)      //The user already unsubscribe when we sent the msg, so the function will return -1
-                std::cout << "Exited club "+ msg_receipt.substr(pos+1,msg_receipt.length()-1);
+            std::cout << "Exited club "+ msg_receipt.substr(pos+1);
         }
         //Check if this receipt is for logout command
-        else if (msg_receipt == "logout"){
+        else if (msg_receipt == "logout"){ /// CHECK CHECK CHECK CHECK
+            registered=false;
+            delete user;
+            user= new User();           //Removing all the parameters of the user
+            this->close();              //Closing the socket
+        }   /// CHECK CHECK CHECK CHECK
 
-        }
-
-
-    ///------------------------MESSAGE received----------------------------------------------------
+    ///-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.MESSAGE received-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
     }else if (first_word=="MESSAGE") {
 
-    ///------------------------ERROR received----------------------------------------------------
-    }else if (first_word=="ERROR"){
+        ///---------------------Status--------------------
+        if (inputByLine[5].find(("status"))!=std::string::npos){      // [5] is the details of the message
+            pos = inputByLine[3].find(":");        // [3] in destination topic
+            std::string topic = inputByLine[3].substr(pos+1);
+            std::string booksList;
+            for (Book* book: user->getInventory()){
+                if (book->getTopic() == topic)
+                    booksList = booksList+book->getBookname()+",";
+            }
+            booksList=booksList.substr(0,booksList.length()-2);    //To delete the last ","
 
+            std::stringstream ss;
+            ss << "SEND\n" <<
+               "destination:"+topic+"\n" <<
+               user->getName()+":"+booksList <<
+               "\n^@";
+            std::string frame = ss.str();
+            sendFrame(frame);                       //Sending the user's book list of this topic
+        }
+
+        ///---------------------Wish to Borrow receive-----------  // if you have the book, tell the server
+        else if (inputByLine[5].find("borrow")!=std::string::npos){
+            pos = inputByLine[5].find(" ");
+            string borrower = inputByLine[5].substr(0,pos);
+            string bookname = inputByLine[5].substr(pos+16);            //Do a substring from the end of word "borrow" until the end = book name
+            if (user->getName() != borrower) {
+                for (Book *book: user->getInventory()) {
+                    if (book->getBookname() == bookname & book->getInMyInventory()) {
+                        pos = inputByLine[3].find(":");        // [3] in destination topic
+                        std::string topic = inputByLine[3].substr(pos + 1);
+
+                        std::stringstream ss;
+                        ss << "SEND\n" <<
+                           "destination:" + topic + "\n" <<
+                           user->getName() + " has " + bookname <<
+                           "\n^@";
+                        std::string frame = ss.str();
+                        sendFrame(frame);                       //Sending that the user has the book
+                        break;
+                    }
+                }
+            }
+        }
+
+        ///---------------------User has Book receive-------------  // if you wanted the book, take it
+        else if (inputByLine[5].find("has")!=std::string::npos){
+            pos = inputByLine[5].find(" ");
+            string loner = inputByLine[5].substr(0,pos-1);
+            string bookname = inputByLine[5].substr(pos+5);
+            if (user->getName()!= loner && user->wasAskedForBook(bookname)){        // if i'm not the loner, AND i was the one who asked for it
+                /** Assumption: only 1 user asked for this specific book...**/
+                user->removeAskedBook(bookname);          // removes the book from the asked list
+                pos = inputByLine[3].find(":");        // [3] in destination topic
+                std::string topic = inputByLine[3].substr(pos + 1);
+                Book* book = new Book(bookname,topic,loner);
+                user->addBook(book);                      // added the book to user's inventory
+
+                std::stringstream ss;
+                ss << "SEND\n" <<
+                   "destination:" + topic + "\n" <<
+                   "Taking " + bookname + " from "+user->getName()<<
+                   "\n^@";
+                std::string frame = ss.str();
+                sendFrame(frame);                       //Sending that the user has the book
+            }
+        }
+
+        ///---------------------Taking Book from Loner------------  // if loner, delete the book
+        else if( inputByLine[5].find("Taking") != std::string::npos){
+            pos = inputByLine[5].find(" ");
+            string msg = inputByLine[5].substr(pos+1);    //Do a substring from the end of word "returning" until the end
+            pos = msg.find_last_of(" ");
+            string loner = msg.substr(pos+1);
+            string bookname = msg.substr(0,pos-5);
+            if(user->getName() == loner){
+                for( Book* book : user->getInventory()){
+                    if(book->getBookname() == bookname) {
+                        book->setInMyInventory(false);      // making the book to FALSE - the book won't be mine
+                        break;
+                    }
+                }
+            }
+        }
+
+        ///---------------------Return book to user---------------  // if you are the loner, than add the book
+        else if (inputByLine[5].find("Returning")!=std::string::npos){
+            pos = inputByLine[5].find(" ");
+            string msg = inputByLine[5].substr(pos+1);    //Do a substring from the end of word "returning" until the end
+            pos = msg.find_last_of(" ");
+            string loner = msg.substr(pos+1);
+            string bookname = msg.substr(0,pos-3);
+            if(user->getName()==loner){
+                for (Book* book: user->getInventory()){
+                    if (book->getBookname()== bookname) {
+                        book->setInMyInventory(true);       // making the book TRUE - I have the book now
+                        break;
+                    }
+                }
+            }
+        }
+
+    ///-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.ERROR received-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+    }else if (first_word=="ERROR"){
+        ///---------------------???????????------------
     }
 
 

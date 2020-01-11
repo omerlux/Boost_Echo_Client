@@ -19,15 +19,47 @@ unordered_map<string, int> &User::get_topic_idByClient_map() { return topic_idBy
 
 unordered_map<int, string> &User::get_receiptId_returned_map() { return receiptId_returned_map;}
 
+unordered_map<string,string> &User::get_askedBook_topic_map() { return askedBook_topic_map;}
+
 vector<Book*> & User::getInventory() { return inventory;}
 
 std::string User::getName() { return name;}
 
 void User::setName(std::string name) { this->name=name;}
+//------------------- end edit 11/1 --------------------------
+
 
 //adding a book to the inventory
-void User::addBook(Book *book) {inventory.push_back(book);}
-//------------------- end edit 11/1 --------------------------
+void User::addBook(Book *book) {
+    //------------------- start edit 11/1 ------------------------
+    inventory.push_back(book);
+    //------------------- end edit 11/1 --------------------------
+
+}
+
+//adding asked book for the map
+void User::addAskedBook(string bookname, string topic) {
+    //------------------- start edit 11/1 ------------------------
+    std::pair<string,string> tmp_pair (bookname,topic);
+    askedBook_topic_map.insert(tmp_pair);
+    //------------------- end edit 11/1 --------------------------
+}
+
+
+///AskedBook
+//remove an asked book from the map
+void User::removeAskedBook(string bookname) {
+    //------------------- start edit 11/1 ------------------------
+    askedBook_topic_map.erase(bookname);
+    //------------------- end edit 11/1 --------------------------
+}
+
+//returns if you asked the book
+bool User::wasAskedForBook(string bookname) {
+    //------------------- start edit 11/1 ------------------------
+    askedBook_topic_map.find(bookname);
+    //------------------- end edit 11/1 --------------------------
+}
 
 
 ///Topic functions

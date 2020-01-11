@@ -20,6 +20,8 @@ public:
     //------------------- start edit 10/1 ------------------------
     //Constructor
     Book(string bookname, string topic, string loner);
+    //Destructor
+    ~Book();
 
     //Getters
     string getBookname();
@@ -27,7 +29,7 @@ public:
     string getLoner();
 
     //Setter
-    void setLoner(string loner);
+    void setLoner(string &loner);
     //------------------- end edit 10/1 --------------------------
 
 };

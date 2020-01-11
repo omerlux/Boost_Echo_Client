@@ -7,7 +7,9 @@
 Book::Book(string bookname, string topic, string loner):
                     bookname(bookname), topic(topic), loner(loner){}
 
-void Book::setLoner(string loner) { this->loner=loner;}
+Book::~Book(){};
+
+void Book::setLoner(string &loner) { this->loner=loner;}
 
 string Book::getBookname() {return this->bookname;}
 

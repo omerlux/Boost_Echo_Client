@@ -10,11 +10,12 @@ class socketReader {
 private:
     //------------------- start edit 10/1 ------------------------
     //stompConnectionHandler &CH;
+    int id;
     //------------------- end edit 10/1 --------------------------
 
 public:
     //------------------- start edit 12/1 ------------------------
-    socketReader();
+    socketReader(int id);
     void run();
     //------------------- end edit 12/1 --------------------------
 };

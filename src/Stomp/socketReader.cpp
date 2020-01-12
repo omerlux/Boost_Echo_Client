@@ -8,15 +8,17 @@
 extern bool logout;
 extern stompConnectionHandler CH;
 
-socketReader::socketReader(){}
+socketReader::socketReader(int id): id(id){}
 
 void socketReader:: run(){
     //------------------- start edit 11/1 ------------------------
     std::string income;
     while (!logout){
-        CH.getFrame(income);                              //returns a FRAME of string - Decoder
-        CH.stompReceivedProcess(income);                  // the receiving process    - Process
-        income ="";
+        if(income!="") {
+            CH.getFrame(income);                              //returns a FRAME of string - Decoder
+            CH.stompReceivedProcess(income);                  // the receiving process    - Process
+            income = "";
+        }
     }
     //------------------- end edit 11/1 --------------------------
 }

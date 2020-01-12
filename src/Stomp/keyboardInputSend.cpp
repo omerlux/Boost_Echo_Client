@@ -5,8 +5,9 @@
 #include "keyboardInputSend.h"
 #include "stompConnectionHandler.h"
 
-keyboardInputSend::keyboardInputSend(stompConnectionHandler &CH):
-                    CH(CH),shutdown(false) {}
+extern stompConnectionHandler CH;
+
+keyboardInputSend::keyboardInputSend():shutdown(false) {}
 
 void keyboardInputSend:: run(){
     //------------------- start edit 11/1 ------------------------
@@ -26,5 +27,11 @@ void keyboardInputSend:: run(){
 void keyboardInputSend::setShutdown(bool state) {
     //------------------- start edit 12/1 ------------------------
     this->shutdown=state;
+    //------------------- end edit 12/1 --------------------------
+}
+
+bool keyboardInputSend::getShutdown() {
+    //------------------- start edit 12/1 ------------------------
+    return shutdown;
     //------------------- end edit 12/1 --------------------------
 }

@@ -3,10 +3,10 @@
 //
 
 #ifndef BOOST_ECHO_CLIENT_STOPMCLIENT_H
-#define BOOST_ECHO_CLIENT_STOPMCLIENT_H
+#define BOOST_ECHO_CLIENT_STOMPCLIENT_H
 
 
-class stopmClient {
+class stompClient {
 
 };
 

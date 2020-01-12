@@ -9,12 +9,12 @@
 class socketReader {
 private:
     //------------------- start edit 10/1 ------------------------
-    stompConnectionHandler &CH;
+    //stompConnectionHandler &CH;
     //------------------- end edit 10/1 --------------------------
 
 public:
     //------------------- start edit 12/1 ------------------------
-    socketReader(stompConnectionHandler &CH,string &str);
+    socketReader();
     void run();
     //------------------- end edit 12/1 --------------------------
 };

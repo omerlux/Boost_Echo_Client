@@ -2,20 +2,31 @@
 // Created by omerlux@wincs.cs.bgu.ac.il on 10/01/2020.
 //
 
-#include "stopmClient.h"
+#include "stompClient.h"
 #include <stdlib.h>
 #include "User.h"
 #include "stompConnectionHandler.h"
 #include "socketReader.h"
 #include "keyboardInputSend.h"
+#include <mutex>
+#include <thread>
+
+User* user;
+stompConnectionHandler CH("127.0.0.1",0,user);
 
 int main (int argc, char *argv[]) {
 
-    User* user = new User();
-    stompConnectionHandler CH(0,0,user);
-    socketReader sReader(CH);
-    keyboardInputSend* kInput = new keyboardInputSend();
+    user = new User();
+    socketReader socketReader_task();
+    keyboardInputSend keyboardIS_task ();
 
+    while(!keyboardIS_task().getShutdown()){
+        std::thread keyboardIS_thread = std::thread(keyboardIS_task);
+        std::thread socketReader_thread = std::thread(socketReader_task);
+
+        keyboardIS_thread.join();
+        socketReader_thread.join();
+    }
 
     //ConnectionHandler connectionHandler(host, port);
    // if (!connectionHandler.connect()) {
@@ -24,7 +35,7 @@ int main (int argc, char *argv[]) {
    // }
 
     //From here we will see the rest of the echo client implementation:
-    while (1) {
+  /*  while (1) {
         const short bufsize = 1024;
         char buf[bufsize];
         std::cin.getline(buf, bufsize);
@@ -59,6 +70,6 @@ int main (int argc, char *argv[]) {
             std::cout << "Exiting...\n" << std::endl;
             break;
         }
-    }
+    }*/
     return 0;
 }

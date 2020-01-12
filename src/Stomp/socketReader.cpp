@@ -6,9 +6,9 @@
 #include "stompConnectionHandler.h"
 
 extern bool logout;
+extern stompConnectionHandler CH;
 
-
-socketReader::socketReader(stompConnectionHandler &CH,string &str):CH(CH){}
+socketReader::socketReader(){}
 
 void socketReader:: run(){
     //------------------- start edit 11/1 ------------------------

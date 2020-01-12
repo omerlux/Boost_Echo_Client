@@ -10,13 +10,14 @@ class keyboardInputSend {
 private:
     //------------------- start edit 10/1 ------------------------
     bool shutdown;
-    stompConnectionHandler &CH;
+    //stompConnectionHandler &CH;
     //------------------- end edit 10/1 --------------------------
 
 public:
     //------------------- start edit 12/1 ------------------------
-    keyboardInputSend (stompConnectionHandler &CH);
+    keyboardInputSend ();
     void setShutdown(bool state);
+    bool getShutdown();
     void run();
     //------------------- end edit 12/1 --------------------------
 };

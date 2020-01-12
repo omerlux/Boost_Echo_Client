@@ -455,7 +455,7 @@ void stompConnectionHandler::stompReceivedProcess(std::string &income) {
     //------------------- end edit 11/1 --------------------------
 }
 
-void stompConnectionHandler::logoutProcess (){ ///TODO: CHECK CHECK CHECK CHECK
+void stompConnectionHandler::logoutProcess (){ // CHECK CHECK CHECK CHECK
     //------------------- start edit 12/1 ------------------------
     registered=false;
     delete user;

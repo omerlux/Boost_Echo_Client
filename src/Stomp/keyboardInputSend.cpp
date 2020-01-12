@@ -5,21 +5,26 @@
 #include "keyboardInputSend.h"
 #include "stompConnectionHandler.h"
 
-keyboardInputSend::keyboardInputSend(stompConnectionHandler &CH, bool &logout):
-                    CH(CH),logout(logout) {}
+keyboardInputSend::keyboardInputSend(stompConnectionHandler &CH):
+                    CH(CH),shutdown(false) {}
 
 void keyboardInputSend:: run(){
     //------------------- start edit 11/1 ------------------------
     std::string input;
-    while (!logout){
+    while (!shutdown){                             // shutdown = closing the client
         getline(std::cin,input);            //reading from keyboard
-        CH.stompSendProcess(input);
+        CH.stompSendProcess(input);            // the send process
         input = "";
-     /*   if (input.compare("logout"))
-            logout=true;            ///to stop writing
-
-
-        //CH.sendLine(input);     //need to convert input to a FRAME */
     }
     //------------------- end edit 11/1 --------------------------
+}
+
+/**
+ * This function is to change the state of the thread
+ * @param state
+ */
+void keyboardInputSend::setShutdown(bool state) {
+    //------------------- start edit 12/1 ------------------------
+    this->shutdown=state;
+    //------------------- end edit 12/1 --------------------------
 }

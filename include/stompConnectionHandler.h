@@ -8,6 +8,8 @@
 #include <string>
 #include <iostream>
 #include "User.h"
+#include "socketReader.h"
+#include "keyboardInputSend.h"
 #include <boost/asio.hpp>
 
 using boost::asio::ip::tcp;
@@ -20,6 +22,7 @@ private:
     tcp::socket socket_;
     User* user;
     bool registered;
+
 
 public:
     stompConnectionHandler(std::string host, short port, User* user);
@@ -63,6 +66,10 @@ public:
     //------------------- start edit 11/1 ------------------------
     // stompSendProcess - Receive a frame from server and act
     void stompReceivedProcess(std::string &income);
+    //------------------- end edit 11/1 --------------------------
+
+    //------------------- start edit 12/1 ------------------------
+    void logoutProcess ();
     //------------------- end edit 11/1 --------------------------
 }; //class ConnectionHandler
 

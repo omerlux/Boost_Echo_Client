@@ -9,15 +9,14 @@
 class socketReader {
 private:
     //------------------- start edit 10/1 ------------------------
-    bool &logout;
     stompConnectionHandler &CH;
     //------------------- end edit 10/1 --------------------------
 
 public:
-    //------------------- start edit 10/1 ------------------------
-    socketReader (stompConnectionHandler &CH, bool &logout);
+    //------------------- start edit 12/1 ------------------------
+    socketReader(stompConnectionHandler &CH,string &str);
     void run();
-    //------------------- end edit 10/1 --------------------------
+    //------------------- end edit 12/1 --------------------------
 };
 
 

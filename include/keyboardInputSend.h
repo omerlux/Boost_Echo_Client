@@ -9,15 +9,16 @@
 class keyboardInputSend {
 private:
     //------------------- start edit 10/1 ------------------------
-    bool &logout;
+    bool shutdown;
     stompConnectionHandler &CH;
     //------------------- end edit 10/1 --------------------------
 
 public:
-    //------------------- start edit 10/1 ------------------------
-    keyboardInputSend (stompConnectionHandler &CH, bool &logout);
+    //------------------- start edit 12/1 ------------------------
+    keyboardInputSend (stompConnectionHandler &CH);
+    void setShutdown(bool state);
     void run();
-    //------------------- end edit 10/1 --------------------------
+    //------------------- end edit 12/1 --------------------------
 };
 
 

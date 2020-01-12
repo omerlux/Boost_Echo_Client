@@ -5,19 +5,19 @@
 #include "socketReader.h"
 #include "stompConnectionHandler.h"
 
-socketReader::socketReader(stompConnectionHandler &CH, bool &logout):
-        CH(CH),logout(logout){}
+extern bool logout;
+
+
+socketReader::socketReader(stompConnectionHandler &CH,string &str):CH(CH){}
 
 void socketReader:: run(){
     //------------------- start edit 11/1 ------------------------
     std::string income;
     while (!logout){
-        CH.getFrame(income);//returns a FRAME of string
-        if(income.find("ERROR")!=std::string::npos) {     //FORUM: close the connection
-            logout=true;
-        }
-        ///CH.stompReceiveProcces.process(income)
-
+        CH.getFrame(income);                              //returns a FRAME of string - Decoder
+        CH.stompReceivedProcess(income);                  // the receiving process    - Process
+        income ="";
     }
     //------------------- end edit 11/1 --------------------------
 }
+

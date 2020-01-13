@@ -13,8 +13,8 @@ void socketReader::run(){
     std::string income;
     while (!logout){
         if (first_login) {
-            bool got_msg = CH.getFrame(income);                              //returns a FRAME of string - Decoder
-            if (got_msg) {
+            //returns a FRAME of string - Decoder
+            if (CH.getFrame(income)) {
                 CH.stompReceivedProcess(income);                  // the receiving process    - Process
                 income = "";
             }

@@ -13,8 +13,10 @@ void keyboardInputSend::run(){
     std::string input;
     while (!do_shutdown){                             // shutdown = closing the client
         getline(std::cin,input);            //reading from keyboard
-        CH.stompSendProcess(input);            // the send process
-        input = "";
+        if(input!="") {
+            CH.stompSendProcess(input);            // the send process
+            input = "";
+        }
     }
     //------------------- end edit 11/1 --------------------------
 }

@@ -11,7 +11,7 @@
 #include <mutex>
 #include <thread>
 
-bool do_shutdown;
+bool do_shutdown=false;
 
 int main (int argc, char *argv[]) {
 

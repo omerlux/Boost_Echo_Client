@@ -1,23 +1,20 @@
 //
-// Created by omerlux@wincs.cs.bgu.ac.il on 10/01/2020.
+// Created by omerlux@wincs.cs.bgu.ac.il on 13/01/2020.
 //
 
 #ifndef BOOST_ECHO_CLIENT_KEYBOARDINPUTSEND_H
 #define BOOST_ECHO_CLIENT_KEYBOARDINPUTSEND_H
-#include "stompConnectionHandler.h"
+
+
+#include <include/ConnectionHandler.h>
 
 class keyboardInputSend {
-private:
-    //------------------- start edit 10/1 ------------------------
-    //stompConnectionHandler &CH;
-    int id;
-    //------------------- end edit 10/1 --------------------------
-
 public:
-    //------------------- start edit 12/1 ------------------------
-    keyboardInputSend (int id);
+    keyboardInputSend(int id, ConnectionHandler& connectionHandler);
     void run();
-    //------------------- end edit 12/1 --------------------------
+private:
+    const int id;
+    ConnectionHandler &CH;
 };
 
 

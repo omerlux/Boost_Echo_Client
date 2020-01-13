@@ -1,16 +1,14 @@
 //
-// Created by omerlux@wincs.cs.bgu.ac.il on 10/01/2020.
+// Created by omerlux@wincs.cs.bgu.ac.il on 13/01/2020.
 //
 
 #include "socketReader.h"
-#include "stompConnectionHandler.h"
 
 extern bool logout;
-extern stompConnectionHandler CH;
 
-socketReader::socketReader(int id): id(id){}
+socketReader::socketReader(int id, ConnectionHandler& CH):id(id),CH(CH){}
 
-void socketReader:: run(){
+void socketReader::run(){
     //------------------- start edit 11/1 ------------------------
     std::string income;
     while (!logout){
@@ -22,4 +20,3 @@ void socketReader:: run(){
     }
     //------------------- end edit 11/1 --------------------------
 }
-

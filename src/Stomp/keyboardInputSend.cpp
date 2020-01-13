@@ -1,16 +1,14 @@
 //
-// Created by omerlux@wincs.cs.bgu.ac.il on 10/01/2020.
+// Created by omerlux@wincs.cs.bgu.ac.il on 13/01/2020.
 //
 
 #include "keyboardInputSend.h"
-#include "stompConnectionHandler.h"
 
-extern stompConnectionHandler CH;
 extern bool do_shutdown;
 
-keyboardInputSend::keyboardInputSend(int id): id(id) {}
+keyboardInputSend::keyboardInputSend(int id, ConnectionHandler& CH):id(id), CH(CH){}
 
-void keyboardInputSend:: run(){
+void keyboardInputSend::run(){
     //------------------- start edit 11/1 ------------------------
     std::string input;
     while (!do_shutdown){                             // shutdown = closing the client

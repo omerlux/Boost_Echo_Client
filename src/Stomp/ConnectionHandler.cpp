@@ -2,7 +2,7 @@
 // Created by omerlux@wincs.cs.bgu.ac.il on 10/01/2020.
 //
 
-#include "stompConnectionHandler.h"
+#include "ConnectionHandler.h"
 #include <string>
 #include <boost/lexical_cast.hpp>// for lexical_cast()
 
@@ -16,16 +16,16 @@ using std::string;
 
 bool logout;
 
-stompConnectionHandler::stompConnectionHandler(string host, short port, User* user):
+ConnectionHandler::ConnectionHandler(string host, short port, User* user):
 host_(host), port_(port), io_service_(), socket_(io_service_), user(user){
     registered=false;
 }
 
-stompConnectionHandler::~stompConnectionHandler() {
+ConnectionHandler::~ConnectionHandler() {
     close();
 }
 
-bool stompConnectionHandler::connect(std::string host, short port) {
+bool ConnectionHandler::connect(std::string host, short port) {
     //------------------- start edit 11/1 ------------------------
     this->host_ =host;
     this->port_ =port;
@@ -47,7 +47,7 @@ bool stompConnectionHandler::connect(std::string host, short port) {
     return true;
 }
 
-bool stompConnectionHandler::getBytes(char bytes[], unsigned int bytesToRead) {
+bool ConnectionHandler::getBytes(char bytes[], unsigned int bytesToRead) {
     size_t tmp = 0;
     boost::system::error_code error;
     try {
@@ -63,7 +63,7 @@ bool stompConnectionHandler::getBytes(char bytes[], unsigned int bytesToRead) {
     return true;
 }
 
-bool stompConnectionHandler::sendBytes(const char bytes[], int bytesToWrite) {
+bool ConnectionHandler::sendBytes(const char bytes[], int bytesToWrite) {
     int tmp = 0;
     boost::system::error_code error;
     try {
@@ -79,16 +79,16 @@ bool stompConnectionHandler::sendBytes(const char bytes[], int bytesToWrite) {
     return true;
 }
 
-bool stompConnectionHandler::getFrame(std::string& line) {      //get bytes Frame (from server) -> translate to string Frame
+bool ConnectionHandler::getFrame(std::string& line) {      //get bytes Frame (from server) -> translate to string Frame
     return getFrameAscii(line, '\0');
 }
 
-bool stompConnectionHandler::sendFrame(std::string& line) {     //get string Frame -> translate to bytes Frame (to server)
+bool ConnectionHandler::sendFrame(std::string& line) {     //get string Frame -> translate to bytes Frame (to server)
     return sendFrameAscii(line, '\0');
 }
 
 
-bool stompConnectionHandler::getFrameAscii(std::string& frame, char delimiter) {
+bool ConnectionHandler::getFrameAscii(std::string& frame, char delimiter) {
     char ch;
     // Stop when we encounter the null character.
     // Notice that the null character is not appended to the frame string.
@@ -109,14 +109,14 @@ bool stompConnectionHandler::getFrameAscii(std::string& frame, char delimiter) {
 }
 
 
-bool stompConnectionHandler::sendFrameAscii(const std::string& frame, char delimiter) {
+bool ConnectionHandler::sendFrameAscii(const std::string& frame, char delimiter) {
     bool result=sendBytes(frame.c_str(),frame.length());
     if(!result) return false;
     return sendBytes(&delimiter,1);
 }
 
 // Close down the connection properly.
-void stompConnectionHandler::close() {
+void ConnectionHandler::close() {
     try{
         socket_.close();
     } catch (...) {
@@ -125,7 +125,7 @@ void stompConnectionHandler::close() {
 }
 
 // stompSendProcess
-void stompConnectionHandler::stompSendProcess(std::string &input) {
+void ConnectionHandler::stompSendProcess(std::string &input) {
     //------------------- start edit 11/1 ------------------------
     std::vector <string> inputBySpace ;
     std::string delimiter = " ";
@@ -143,7 +143,7 @@ void stompConnectionHandler::stompSendProcess(std::string &input) {
 
     ///------------------------Login send----------------------------------------------------
     if(first_word == "login"){
-        size_t pos = input.find(":");
+        size_t pos = inputBySpace[1].find(":");
         std::string host = inputBySpace[1].substr(0,pos);
         std::string port_str = inputBySpace[1].substr(pos+1);
         short port = std::stoul (port_str,nullptr,0);
@@ -283,7 +283,7 @@ void stompConnectionHandler::stompSendProcess(std::string &input) {
 
 
 // stompReceivedProcess
-void stompConnectionHandler::stompReceivedProcess(std::string &income) {
+void ConnectionHandler::stompReceivedProcess(std::string &income) {
     //------------------- start edit 11/1 ------------------------
     std::vector<string> inputByLine;
     std::string delimiter = "\n";
@@ -455,7 +455,7 @@ void stompConnectionHandler::stompReceivedProcess(std::string &income) {
     //------------------- end edit 11/1 --------------------------
 }
 
-void stompConnectionHandler::logoutProcess (){ // CHECK CHECK CHECK CHECK
+void ConnectionHandler::logoutProcess (){ // CHECK CHECK CHECK CHECK
     //------------------- start edit 12/1 ------------------------
     registered=false;
     delete user;

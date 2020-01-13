@@ -1,5 +1,5 @@
-#ifndef CONNECTION_HANDLER__
-#define CONNECTION_HANDLER__
+#ifndef OLDCONNECTION_HANDLER__
+#define OLDCONNECTION_HANDLER__
                                            
 #include <string>
 #include <iostream>
@@ -7,7 +7,7 @@
 
 using boost::asio::ip::tcp;
 
-class ConnectionHandler {
+class oldconnectionHandler {
 private:
 	const std::string host_;
 	const short port_;
@@ -15,8 +15,8 @@ private:
 	tcp::socket socket_; 
  
 public:
-    ConnectionHandler(std::string host, short port);
-    virtual ~ConnectionHandler();
+    oldconnectionHandler(std::string host, short port);
+    virtual ~oldconnectionHandler();
  
     // Connect to the remote machine
     bool connect();
@@ -48,6 +48,6 @@ public:
     // Close down the connection properly.
     void close();
  
-}; //class ConnectionHandler
+}; //class oldconnectionHandler
  
 #endif

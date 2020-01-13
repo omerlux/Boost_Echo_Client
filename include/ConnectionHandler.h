@@ -2,19 +2,18 @@
 // Created by omerlux@wincs.cs.bgu.ac.il on 10/01/2020.
 //
 
-#ifndef BOOST_ECHO_CLIENT_STOMPCONNECTIONHANDLER_H
-#define BOOST_ECHO_CLIENT_STOMPCONNECTIONHANDLER_H
+#ifndef BOOST_ECHO_CLIENT_CONNECTIONHANDLER_H
+#define BOOST_ECHO_CLIENT_CONNECTIONHANDLER_H
+
 
 #include <string>
 #include <iostream>
 #include "User.h"
-#include "socketReader.h"
-#include "keyboardInputSend.h"
 #include <boost/asio.hpp>
 
 using boost::asio::ip::tcp;
 
-class stompConnectionHandler {
+class ConnectionHandler {
 private:
     std::string host_;
     short port_;
@@ -25,8 +24,8 @@ private:
 
 
 public:
-    stompConnectionHandler(std::string host, short port, User* user);
-    virtual ~stompConnectionHandler();
+    ConnectionHandler(std::string host, short port, User* user);
+    virtual ~ConnectionHandler();
 
     // Connect to the remote machine
     bool connect(std::string host, short port);
@@ -74,4 +73,4 @@ public:
 }; //class ConnectionHandler
 
 
-#endif //BOOST_ECHO_CLIENT_STOMPCONNECTIONHANDLER_H
+#endif //BOOST_ECHO_CLIENT_CONNECTIONHANDLER_H

@@ -14,7 +14,8 @@ using std::cerr;
 using std::endl;
 using std::string;
 
-bool logout;
+bool logout = false;
+bool first_login = false;
 
 ConnectionHandler::ConnectionHandler(string host, short port, User* user):
 host_(host), port_(port), io_service_(), socket_(io_service_), user(user){
@@ -153,6 +154,7 @@ void ConnectionHandler::stompSendProcess(std::string &input) {
                 std::cerr<<"Could not connect to server" << std::endl;
             }
             else {                                                           //If connection is good - GO!!!
+                first_login = true;
                 registered = true;
                 logout = false;                                                // thread will start to run - global variable
                 user->setName(inputBySpace[2]);                         // [2] is the user name

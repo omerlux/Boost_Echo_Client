@@ -12,6 +12,8 @@
 #include <thread>
 
 bool do_shutdown=false;
+bool logout = false;
+std::string last_input="";
 
 int main (int argc, char *argv[]) {
 
@@ -20,13 +22,14 @@ int main (int argc, char *argv[]) {
     socketReader socketReader_task (1,connectionHandler);
     keyboardInputSend keyboardIS_task(2,connectionHandler);
 
-    //while(!do_shutdown){        // will shutdown when got a specific string after logged out
-        std::thread keyboardIS_thread (&keyboardInputSend::run, &keyboardIS_task);
-        std::thread socketReader_thread (&socketReader::run, &socketReader_task);
+    while(!do_shutdown){        // will shutdown when got a specific string after logged out
+        std::thread keyboardIS_thread(&keyboardInputSend::run, &keyboardIS_task);
+        std::thread socketReader_thread(&socketReader::run, &socketReader_task);
 
         socketReader_thread.join();
         keyboardIS_thread.join();
-   // }
+
+    }
 
     delete user;
     return 0;

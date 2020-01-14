@@ -2,7 +2,7 @@
 // Created by omerlux@wincs.cs.bgu.ac.il on 10/01/2020.
 //
 
-#include "StompBookClubClient.h"
+#include "../include/StompBookClubClient.h"
 #include <stdlib.h>
 #include "../include/User.h"
 #include "../include/ConnectionHandler.h"

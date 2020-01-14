@@ -2,7 +2,7 @@
 // Created by omerlux@wincs.cs.bgu.ac.il on 13/01/2020.
 //
 
-#include "socketReader.h"
+#include "../include/socketReader.h"
 
 extern bool logout;
 extern bool first_login;

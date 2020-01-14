@@ -2,7 +2,7 @@
 // Created by omerlux@wincs.cs.bgu.ac.il on 10/01/2020.
 //
 
-#include "Book.h"
+#include "../include/Book.h"
 //------------------- start edit 10/1 ------------------------
 Book::Book(string bookname, string topic, string loner):
                     bookname(bookname), topic(topic), loner(loner), inMyInventory(true){}

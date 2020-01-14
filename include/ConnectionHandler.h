@@ -20,14 +20,14 @@ private:
     short port_;
     boost::asio::io_service io_service_;   // Provides core I/O functionality
     tcp::socket socket_;
-    User* user;
+    User& user;
     bool registered;
     std::string oldUser;            //saving username to change user in cpp
     std::mutex _mutex;             //mutex for locking sendFrame
 
 
 public:
-    ConnectionHandler(std::string host, short port, User* user);
+    ConnectionHandler(std::string host, short port, User& user);
     virtual ~ConnectionHandler();
 
     // Connect to the remote machine

@@ -6,7 +6,7 @@
 #define BOOST_ECHO_CLIENT_USER_H
 
 #include <vector>
-#include <include/Book.h>
+#include "Book.h"
 #include <unordered_map>
 
 using std::vector;
@@ -25,11 +25,14 @@ private:
     //------------------- end edit 10/1 --------------------------
 
 public:
-    //------------------- start edit 10/1 ------------------------
+    //------------------- start edit 14/1 ------------------------
     //Constructor
     User();
     //Destructor
     ~User();
+
+    //ResetUser
+    void resetUser();
 
     //Getters
     unordered_map<string,int> &get_topic_idByClient_map ();
@@ -58,7 +61,7 @@ public:
     int addReceiptId(string details);
     void returnedReceiptId(int receiptId);
     string receiptStatus (int receiptId);
-    //------------------- end edit 10/1 --------------------------
+    //------------------- end edit 14/1 --------------------------
 };
 
 

@@ -13,4 +13,4 @@ link_libraries("-lboost_system")
 
 
 add_executable(stompClient
-        makefile src/Stomp/stompClient.cpp include/stompClient.h src/Stomp/ConnectionHandler.cpp include/ConnectionHandler.h src/Stomp/User.cpp include/User.h src/Stomp/Book.cpp include/Book.h src/Stomp/socketReader.cpp include/socketReader.h src/Stomp/keyboardInputSend.cpp include/keyboardInputSend.h)
+        makefile src/Stomp/StompBookClubClient.cpp include/StompBookClubClient.h src/Stomp/ConnectionHandler.cpp include/ConnectionHandler.h src/Stomp/User.cpp include/User.h src/Stomp/Book.cpp include/Book.h src/Stomp/socketReader.cpp include/socketReader.h src/Stomp/keyboardInputSend.cpp include/keyboardInputSend.h)

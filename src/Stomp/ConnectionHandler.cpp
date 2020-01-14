@@ -2,7 +2,7 @@
 // Created by omerlux@wincs.cs.bgu.ac.il on 10/01/2020.
 //
 
-#include "ConnectionHandler.h"
+#include "../include/ConnectionHandler.h"
 #include <string>
 #include <boost/lexical_cast.hpp>// for lexical_cast()
 #include <mutex>
@@ -19,11 +19,8 @@ extern bool logout;
 bool first_login = false;
 extern bool do_shutdown;
 
-ConnectionHandler::ConnectionHandler(string host, short port, User* user):
-host_(host), port_(port), io_service_(), socket_(io_service_), user(user){
-    registered=false;
-    oldUser="";
-}
+ConnectionHandler::ConnectionHandler(string host, short port, User& user):
+host_(host), port_(port), io_service_(), socket_(io_service_), user(user),registered(false),oldUser(""),_mutex(){}
 
 ConnectionHandler::~ConnectionHandler() {
     close();
@@ -176,9 +173,9 @@ void ConnectionHandler::stompSendProcess(std::string &input) {
     ///------------------------Join send----------------------------------------------------
     }else if(first_word == "join"){
         string topic = inputBySpace[1];                                     // [1] is the topic name
-        int topicId = user->subTopic(topic);
+        int topicId = user.subTopic(topic);
         if(topicId!=-1) {
-            int receiptId = user->addReceiptId("join " + topic);          //The user subscribe to topic
+            int receiptId = user.addReceiptId("join " + topic);          //The user subscribe to topic
 
             std::stringstream ss2;
             ss2 << "SUBSCRIBE\n" <<
@@ -192,9 +189,9 @@ void ConnectionHandler::stompSendProcess(std::string &input) {
     ///------------------------Exit send----------------------------------------------------
     }else if(first_word == "exit"){
         string topic = inputBySpace[1];                                     // [1] is the topic name
-        int topicId = user->unsubtopic(topic);                            // changing the database of the topic
+        int topicId = user.unsubtopic(topic);                            // changing the database of the topic
         if(topicId != -1){
-            int receiptId = user->addReceiptId("exit "+topic);
+            int receiptId = user.addReceiptId("exit "+topic);
 
             std::stringstream ss2;
             ss2 << "UNSUBSCRIBE\n" <<
@@ -208,10 +205,10 @@ void ConnectionHandler::stompSendProcess(std::string &input) {
     ///------------------------Add send----------------------------------------------------
     }else if(first_word == "add"){
         string bookname = inputBySpace[2];
-        for (int i=3; i<inputBySpace.size();i++)
+        for (unsigned int i=3; i<inputBySpace.size();i++)
             bookname += " "+inputBySpace[i];
         bool alreadyExists=false;
-        for(Book* b : user->getInventory()){
+        for(Book* b : user.getInventory()){
             if(b->getBookname()==bookname){
                 alreadyExists=true;
                 break;
@@ -219,47 +216,47 @@ void ConnectionHandler::stompSendProcess(std::string &input) {
         }
         if(!alreadyExists) {
             Book *new_book = new Book(bookname, inputBySpace[1],
-                                      user->getName()); //creating new book with no loners - default is username
-            user->addBook(new_book);
+                                      user.getName()); //creating new book with no loners - default is username
+            user.addBook(new_book);
 
             std::stringstream ss;
             ss << "SEND\n" <<
                "destination:" + inputBySpace[1] + "\n\n" <<                              // [1] is the topic name
-               user->getName() + " has added the book " + bookname + "\n^@";    // [2] is the book name
+               user.getName() + " has added the book " + bookname + "\n^@";    // [2] is the book name
             std::string frame = ss.str();
             sendFrame(frame); //ENCODER
         }
         else{
-            cout<<"Already have that book\n";
+            cout<<"You already have that book\n";
         }
 
      ///------------------------Borrow send----------------------------------------------------
     }else if(first_word == "borrow"){
         string bookname = inputBySpace[2];
-        for (int i=3; i<inputBySpace.size();i++)
+        for (unsigned int i=3; i<inputBySpace.size();i++)
             bookname += " "+inputBySpace[i];
-        user->addAskedBook(bookname,inputBySpace[1]);                   // [1] is the topic name
+        user.addAskedBook(bookname,inputBySpace[1]);                   // [1] is the topic name
 
         std::stringstream ss;
         ss << "SEND\n" <<
             "destination:"+inputBySpace[1]+"\n\n" <<                            // [1] is the topic name
-            user->getName()+" wish to borrow "+bookname+"\n^@";        // [2] is the book name
+            user.getName()+" wish to borrow "+bookname+"\n^@";        // [2] is the book name
         std::string frame = ss.str();
         sendFrame(frame); //ENCODER
 
     ///------------------------Return send----------------------------------------------------
     }else if(first_word == "return"){
         string bookname = inputBySpace[2];
-        for (int i=3; i<inputBySpace.size();i++)
+        for (unsigned int i=3; i<inputBySpace.size();i++)
             bookname += " "+inputBySpace[i];
 
         string loner="";
-        for(Book* book: user->getInventory()){                  // searching for the book we want to return
+        for(Book* book: user.getInventory()){                  // searching for the book we want to return
             if(book->getBookname() == bookname) {               // [2] is the book name
                 loner = book->getLoner();                       // if loner is real name, than we will delete the book and send the frame
-                if(loner!=user->getName()) {                    // loner is the user, only if its not loaned
-                    user->getInventory().erase(
-                            std::remove(user->getInventory().begin(), user->getInventory().end(), book));
+                if(loner!=user.getName()) {                    // loner is the user, only if its not loaned
+                    user.getInventory().erase(
+                            std::remove(user.getInventory().begin(), user.getInventory().end(), book));
                     delete book;
 
                     std::stringstream ss;
@@ -284,7 +281,7 @@ void ConnectionHandler::stompSendProcess(std::string &input) {
 
      ///------------------------Logout send----------------------------------------------------
     }else if(first_word == "logout") {
-        int receiptId = user->addReceiptId("logout");
+        int receiptId = user.addReceiptId("logout");
 
         std::stringstream ss;
         ss << "DISCONNECT\n" <<
@@ -317,14 +314,14 @@ void ConnectionHandler::stompReceivedProcess(std::string &income) {
 
     ///-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.CONNECTED received-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
     if (first_word == "CONNECTED") {
-        user->setName(oldUser);                         // [2] is the user name
+        user.setName(oldUser);                         // [2] is the user name
         std::cout << "Login successful\n";
 
         ///-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.RECEIPT received-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
     } else if (first_word == "RECEIPT") {
         size_t pos = inputByLine[1].find(":");
         string receiptId_str = inputByLine[1].substr(pos + 1);
-        string msg_receipt = user->receiptStatus(stoi(receiptId_str));
+        string msg_receipt = user.receiptStatus(stoi(receiptId_str));
         //Check if this receipt is for join command
         if (msg_receipt.find("join") != std::string::npos) {
             pos = msg_receipt.find(" ");
@@ -348,7 +345,7 @@ void ConnectionHandler::stompReceivedProcess(std::string &income) {
         if (inputByLine[5].find("has added the book") != std::string::npos){
             pos = inputByLine[3].find(":");        // [3] in destination topic
             std::string topic = inputByLine[3].substr(pos + 1);
-            std::cout<< topic+": "+inputByLine[5]+"\n";                 //Printing to the screen {topic}:{content}
+            std::cout<< topic+":"+inputByLine[5]+"\n";                 //Printing to the screen {topic}:{content}
         }
 
             ///---------------------Wish to Borrow receive-----------  // if you have the book, tell the server
@@ -358,16 +355,16 @@ void ConnectionHandler::stompReceivedProcess(std::string &income) {
             string bookname = inputByLine[5].substr(pos + 16);            //Do a substring from the end of word "borrow" until the end = book name
             pos = inputByLine[3].find(":");        // [3] in destination topic
             std::string topic = inputByLine[3].substr(pos + 1);
-            std::cout<< topic+": "+inputByLine[5]+"\n";                 //Printing to the screen {topic}:{content}
+            std::cout<< topic+":"+inputByLine[5]+"\n";                 //Printing to the screen {topic}:{content}
 
-            if (user->getName() != borrower) {
-                for (Book *book: user->getInventory()) {
-                    if (book->getBookname() == bookname & book->getInMyInventory()) {
+            if (user.getName() != borrower) {
+                for (Book *book: user.getInventory()) {
+                    if ((book->getBookname() == bookname) & (book->getInMyInventory())) {
 
                         std::stringstream ss;
                         ss << "SEND\n" <<
                            "destination:" + topic + "\n\n" <<
-                           user->getName() + " has " + bookname <<
+                           user.getName() + " has " + bookname <<
                            "\n^@";
                         std::string frame = ss.str();
                         sendFrame(frame); //ENCODER                            //Sending that the user has the book
@@ -384,13 +381,13 @@ void ConnectionHandler::stompReceivedProcess(std::string &income) {
             string bookname = inputByLine[5].substr(pos + 5);
             pos = inputByLine[3].find(":");        // [3] in destination topic
             std::string topic = inputByLine[3].substr(pos + 1);
-            std::cout<< topic+": "+inputByLine[5]+"\n";                 //Printing to the screen {topic}:{content}
+            std::cout<< topic+":"+inputByLine[5]+"\n";                 //Printing to the screen {topic}:{content}
 
-            if (user->getName() != loner && user->wasAskedForBook(bookname)) {    // if i'm not the loner, AND i was the one who asked for it
+            if (user.getName() != loner && user.wasAskedForBook(bookname)) {    // if i'm not the loner, AND i was the one who asked for it
                 /** Assumption: only 1 user asked for this specific book...**/
-                user->removeAskedBook(bookname);          // removes the book from the asked list
+                user.removeAskedBook(bookname);          // removes the book from the asked list
                 Book *book = new Book(bookname, topic, loner);
-                user->addBook(book);                      // added the book to user's inventory
+                user.addBook(book);                      // added the book to user's inventory
 
                 std::stringstream ss;
                 ss << "SEND\n" <<
@@ -411,10 +408,10 @@ void ConnectionHandler::stompReceivedProcess(std::string &income) {
             string bookname = msg.substr(0, pos - 5);
             pos = inputByLine[3].find(":");        // [3] in destination topic
             std::string topic = inputByLine[3].substr(pos + 1);
-            std::cout<< topic+": "+inputByLine[5]+"\n";                 //Printing to the screen {topic}:{content}
+            std::cout<< topic+":"+inputByLine[5]+"\n";                 //Printing to the screen {topic}:{content}
 
-            if (user->getName() == loner) {
-                for (Book *book : user->getInventory()) {
+            if (user.getName() == loner) {
+                for (Book *book : user.getInventory()) {
                     if (book->getBookname() == bookname) {
                         book->setInMyInventory(false);      // making the book to FALSE - the book won't be mine
                         break;
@@ -433,11 +430,11 @@ void ConnectionHandler::stompReceivedProcess(std::string &income) {
             string bookname = msg.substr(0, pos - 3);
             pos = inputByLine[3].find(":");        // [3] in destination topic
             std::string topic = inputByLine[3].substr(pos + 1);
-            std::cout<< topic+": "+inputByLine[5]+"\n";                 //Printing to the screen {topic}:{content}
+            std::cout<< topic+":"+inputByLine[5]+"\n";                 //Printing to the screen {topic}:{content}
 
-            if (user->getName() == loner) {
+            if (user.getName() == loner) {
                 bool bookGotDeleted = true;
-                for (Book *book: user->getInventory()) {
+                for (Book *book: user.getInventory()) {
                     if (book->getBookname() == bookname) {
                         book->setInMyInventory(true);       // making the book TRUE - I have the book now
                         bookGotDeleted = false;                   // when the user is logged out the book is gone. we might not have it
@@ -447,8 +444,8 @@ void ConnectionHandler::stompReceivedProcess(std::string &income) {
                 if (bookGotDeleted) {                               // user logged out - we must create the book again
                     /** Assumption: the if this loner has to return it to someone else, it won't happen - he stole the book**/
                     std::string topic = inputByLine[3].substr(pos + 1);
-                    Book *b = new Book(bookname, topic, user->getName());           // creating the new book
-                    user->addBook(b);                                             // adding the book to the user
+                    Book *b = new Book(bookname, topic, user.getName());           // creating the new book
+                    user.addBook(b);                                             // adding the book to the user
                 }
             }
         }
@@ -458,17 +455,17 @@ void ConnectionHandler::stompReceivedProcess(std::string &income) {
             pos = inputByLine[3].find(":");        // [3] in destination topic
             std::string topic = inputByLine[3].substr(pos + 1);
             std::string booksList;
-            for (Book *book: user->getInventory()) {
-                if (book->getTopic() == topic & book->getInMyInventory())       //the book is in this genre and in my inventory
+            for (Book *book: user.getInventory()) {
+                if ((book->getTopic() == topic) & (book->getInMyInventory()))       //the book is in this genre and in my inventory
                     booksList = booksList + book->getBookname() + ",";
             }
             booksList = booksList.substr(0, booksList.length() - 1);    //To delete the last ","
-            std::cout<< topic+": "+inputByLine[5]+"\n";                 //Printing to the screen {topic}:{content}
+            std::cout<< topic+":"+inputByLine[5]+"\n";                 //Printing to the screen {topic}:{content}
 
             std::stringstream ss;
             ss << "SEND\n" <<
                "destination:" + topic + "\n\n" <<
-               user->getName() + ":" + booksList <<
+               user.getName() + ":" + booksList <<
                "\n^@";
             std::string frame = ss.str();
             sendFrame(frame); //ENCODER                             //Sending the user's book list of this topic
@@ -478,7 +475,7 @@ void ConnectionHandler::stompReceivedProcess(std::string &income) {
         else if (inputByLine[5].find(":") != std::string::npos) {
             pos = inputByLine[3].find(":");        // [3] in destination topic
             std::string topic = inputByLine[3].substr(pos + 1);
-            std::cout<< topic+": "+inputByLine[5]+"\n";                 //Printing to the screen {topic}:{content}
+            std::cout<< topic+":"+inputByLine[5]+"\n";                 //Printing to the screen {topic}:{content}
         }
 
     ///-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.ERROR received-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
@@ -504,13 +501,12 @@ void ConnectionHandler::stompReceivedProcess(std::string &income) {
 }
 
 void ConnectionHandler::logoutProcess (){ // CHECK CHECK CHECK CHECK
-    //------------------- start edit 12/1 ------------------------
+    //------------------- start edit 14/1 ------------------------
     registered=false;
-    delete user;
-    user= new User();           //Removing all the parameters of the user
+    user.resetUser();           //Removing all the parameters of the user
     logout = true;              //Global variable
     this->close();              //Closing the socket
-    //------------------- end edit 11/1 --------------------------
+    //------------------- end edit 14/1 --------------------------
 }
 
 

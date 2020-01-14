@@ -6,7 +6,7 @@
 #define BOOST_ECHO_CLIENT_SOCKETREADER_H
 
 
-#include <include/ConnectionHandler.h>
+#include "ConnectionHandler.h"
 
 class socketReader {
 public:

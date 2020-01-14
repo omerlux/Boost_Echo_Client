@@ -2,12 +2,12 @@
 // Created by omerlux@wincs.cs.bgu.ac.il on 10/01/2020.
 //
 
-#include "stompClient.h"
+#include "StompBookClubClient.h"
 #include <stdlib.h>
-#include "User.h"
-#include "ConnectionHandler.h"
-#include "socketReader.h"
-#include "keyboardInputSend.h"
+#include "../include/User.h"
+#include "../include/ConnectionHandler.h"
+#include "../include/socketReader.h"
+#include "../include/keyboardInputSend.h"
 #include <mutex>
 #include <thread>
 
@@ -18,7 +18,7 @@ std::string last_input="";
 int main (int argc, char *argv[]) {
 
     User* user = new User();
-    ConnectionHandler connectionHandler ("0",0,user);
+    ConnectionHandler connectionHandler ("0",0,*user);
     socketReader socketReader_task (1,connectionHandler);
     keyboardInputSend keyboardIS_task(2,connectionHandler);
 

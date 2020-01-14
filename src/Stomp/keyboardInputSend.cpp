@@ -2,7 +2,7 @@
 // Created by omerlux@wincs.cs.bgu.ac.il on 13/01/2020.
 //
 
-#include "keyboardInputSend.h"
+#include "../include/keyboardInputSend.h"
 
 extern bool do_shutdown;
 extern bool logout;
@@ -22,14 +22,14 @@ void keyboardInputSend::run(){
             last_input="";
         }
 
-        if(input!="" & !logout) {
+        if((input!="") & (!logout)) {
             ///------------------logged in procces send------------
             CH.stompSendProcess(input);         // the send process
             input = "";
-        }else if(input=="shutdown" & logout) {       //only if user logged out, we will allow shutdown
+        }else if((input=="shutdown") & (logout)) {       //only if user logged out, we will allow shutdown
             ///------------------shutdown send---------------------
             do_shutdown = true;
-        }else if(logout & input.find("login")!= std::string::npos){     //user wants to log in again
+        }else if((logout) & (input.find("login")!= std::string::npos)){     //user wants to log in again
             ///----------login again - rerun threads proccess------
             last_input=input;
             logout=false;       //for making the socketReader, to run on the while

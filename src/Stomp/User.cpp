@@ -3,11 +3,11 @@
 //
 #include <string>
 #include <unordered_map>
-#include "Book.h"
-#include "User.h"
+#include "../include/Book.h"
+#include "../include/User.h"
 //------------------- start edit 11/1 ------------------------
 User::User(): name(),inventory(), topic_idByClient_map(),receiptId_returned_map(),
-topicIdCounter(1), receiptIdCounter(1){};
+topicIdCounter(1), receiptIdCounter(1), askedBook_topic_map(){};
 
 User::~User(){
     for( Book *b:inventory){
@@ -57,7 +57,7 @@ void User::removeAskedBook(string bookname) {
 //returns if you asked the book
 bool User::wasAskedForBook(string bookname) {
     //------------------- start edit 11/1 ------------------------
-    askedBook_topic_map.find(bookname);
+    return (askedBook_topic_map.find(bookname)!=askedBook_topic_map.end());
     //------------------- end edit 11/1 --------------------------
 }
 
@@ -116,6 +116,21 @@ string User::receiptStatus(int receiptId) {
     //------------------- start edit 11/1 ------------------------
     return receiptId_returned_map.find(receiptId)->second;
     //------------------- end edit 11/1 --------------------------
+}
 
+//Reset User
+void User::resetUser() {
+    //------------------- start edit 14/1 ------------------------
+    name="";
+    for(Book* b: inventory){
+        delete b;
+    }
+    inventory.clear();
+    topic_idByClient_map.clear();
+    receiptId_returned_map.clear();
+    topicIdCounter=1;
+    receiptIdCounter=1;
+    askedBook_topic_map.clear();
+    //------------------- end edit 14/1 --------------------------
 }
 

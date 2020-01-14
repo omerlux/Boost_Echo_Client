@@ -1,34 +1,29 @@
-# define some Makefile variables for the compiler and compiler flags
-# to use Makefile variables later in the Makefile: $()
-CC = g++
-CFLAGS  = -g -Wall -Weffc++ -std=c++11 -Include -pthread
-LDFLAGS = -lboost_system -pthread
-LFLAGS  = -L/usr/lib
+CFLAGS: = -c -Wall -Weffc++ -g -std=c++11 -Iinclude
+LDFLAGS: = -lboost_system
 
-# All Targets
 all: StompBookClubClient
+    g++ -pthread -o bin/StompBookClubClient bin/ConnectionHandler.o  bin/Book.o bin/keyboardInputSend.o bin/socketReader.o bin/User.o $(LDFLAGS)
 
-# Tool invocations
-StompBookClubClient: bin/Stomp/StompBookClubClient.o bin/Stomp/Book.o bin/Stomp/keyboardInputSend.o bin/Stomp/socketReader.o bin/Stomp/ConnectionHandler.o bin/Stomp/User.o $(LDFLAGS)
-	@echo 'Building target: StompBookClubClient'
-	@echo 'Invoking: C++ Linker'
-	@echo 'Finished building target: stompClient'
-	@echo ' '
+StompBookClubClient: bin/StompBookClubClient bin/ConnectionHandler.o  bin/Book.o bin/keyboardInputSend.o bin/socketReader.o bin/User.o
 
-# Depends on the source and header files
-bin/Stomp/stompClient.o: bin/Stomp/stompClient.cpp
-	$(CC) $(CFLAGS) -c -Iinclude -o bin/Stomp/StompBookClubClient.o bin/Stomp/StompBookClubClient.cpp -pthread
-bin/Stomp/Book.o: bin/Stomp/Book.cpp
-	$(CC) $(CFLAGS) -c -Iinclude -o bin/Stomp/Book.o bin/Stomp/Book.cpp
-bin/Stomp/keyboardInputSend.o: bin/Stomp/keyboardInputSend.cpp
-	$(CC) $(CFLAGS) -c -Iinclude -o bin/Stomp/keyboardInputSend.o bin/Stomp/keyboardInputSend.cpp
-bin/Stomp/socketReader.o: bin/Stomp/socketReader.cpp
-	$(CC) $(CFLAGS) -c -Iinclude -o bin/Stomp/socketReader.o bin/Stomp/socketReader.cpp
-bin/Stomp/stompConnectionHandler.o: bin/Stomp/stompConnectionHandler.cpp
-	$(CC) $(CFLAGS) -c -Iinclude -o bin/Stomp/stompConnectionHandler.o bin/Stomp/stompConnectionHandler.cpp
-bin/Stomp/User.o: bin/Stomp/User.cpp
-	$(CC) $(CFLAGS) -c -Iinclude -o bin/Stomp/User.o bin/Stomp/User.cpp
+bin/Book.o: src/Stomp/Book.cpp
+    g++ -pthread $(CFLAGS) -o bin/Book.o src/Book.cpp
 
-#Clean the build directory
-clean: 
-	rm -f bin/*
+bin/ConnectionHandler.o: src/Stomp/ConnectionHandler.cpp
+    g++ -pthread $(CFLAGS) -o bin/ConnectionHandler.o src/ConnectionHandler.cpp
+
+bin/keyboardInputSend.o: src/Stomp/keyboardInputSend.cpp
+    g++ -pthread $(CFLAGS) -o bin/keyboardInputSend.o src/keyboardInputSend.cpp
+
+bin/socketReader.o: src/Stomp/socketReader.cpp
+    g++ -pthread $(CFLAGS) -o bin/socketReader.o src/socketReader.cpp
+
+bin/StompBookClubClient.o: src/Stomp/StompBookClubClient.cpp
+    g++ -pthread $(CFLAGS) -o bin/StompBookClubClient.o src/StompBookClubClient.cpp
+
+bin/User.o: src/Stomp/User.cpp
+    g++ -pthread $(CFLAGS) -o bin/User.o src/User.cpp
+
+.PHONY: clean
+clean:
+    rm -f bin/*

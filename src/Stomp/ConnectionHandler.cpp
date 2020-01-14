@@ -21,6 +21,7 @@ extern bool do_shutdown;
 ConnectionHandler::ConnectionHandler(string host, short port, User* user):
 host_(host), port_(port), io_service_(), socket_(io_service_), user(user){
     registered=false;
+    oldUser="";
 }
 
 ConnectionHandler::~ConnectionHandler() {
@@ -86,8 +87,9 @@ bool ConnectionHandler::getFrame(std::string& line) {      //get bytes Frame (fr
 }
 
 bool ConnectionHandler::sendFrame(std::string& line) {     //get string Frame -> translate to bytes Frame (to server)
+    std::lock_guard<std::mutex> lock(_mutex);           //locking mutex for send frame
     return sendFrameAscii(line, '\0');
-}
+}//destructor of the mutex
 
 
 bool ConnectionHandler::getFrameAscii(std::string& frame, char delimiter) {
@@ -158,8 +160,8 @@ void ConnectionHandler::stompSendProcess(std::string &input) {
             first_login = true;                                           //to not mess up the connection to the server - only if true, we read from socket
             registered = true;
             logout = false;                                                // thread will start to run - global variable
-            user->setName(inputBySpace[2]);                         // [2] is the user name
-            //TODO: move this set name to after receiving "connected"
+            oldUser=inputBySpace[2];                                      //olduser = this username that was entered - will be used when connected
+                    //user->setName(inputBySpace[2]);                //move this set name to after receiving "connected"
             std::stringstream ss;
             ss << "CONNECT\n" <<
             "accept-version:1.2\n" <<
@@ -300,6 +302,7 @@ void ConnectionHandler::stompReceivedProcess(std::string &income) {
 
     ///-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.CONNECTED received-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
     if (first_word == "CONNECTED") {
+        user->setName(oldUser);                         // [2] is the user name
         std::cout << "Login successful\n";
 
         ///-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.RECEIPT received-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.

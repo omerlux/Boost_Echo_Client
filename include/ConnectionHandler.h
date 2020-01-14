@@ -21,6 +21,8 @@ private:
     tcp::socket socket_;
     User* user;
     bool registered;
+    std::string oldUser;            //saving username to change user in cpp
+    std::mutex _mutex;             //mutex for locking sendFrame
 
 
 public:

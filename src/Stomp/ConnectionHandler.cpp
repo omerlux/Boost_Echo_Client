@@ -211,7 +211,7 @@ void ConnectionHandler::stompSendProcess(std::string &input) {
         std::stringstream ss;
         ss << "SEND\n" <<
             "destination:"+inputBySpace[1]+"\n\n" <<                              // [1] is the topic name
-            user->getName()+" has added the book "+inputBySpace[2]+"\n^@";    // [2] is the book name
+            user->getName()+" has added the book "+bookname+"\n^@";    // [2] is the book name
         std::string frame = ss.str();
         sendFrame(frame); //ENCODER
 
@@ -247,7 +247,7 @@ void ConnectionHandler::stompSendProcess(std::string &input) {
                     std::stringstream ss;
                     ss << "SEND\n" <<
                        "destination:" + inputBySpace[1] + "\n\n" <<
-                       " returning " + bookname + " to " + loner + "\n^@";
+                       "Returning " + bookname + " to " + loner + "\n^@";
                     std::string frame = ss.str();
                     sendFrame(frame); //ENCODER
                 }
@@ -361,7 +361,7 @@ void ConnectionHandler::stompReceivedProcess(std::string &income) {
             ///---------------------User has Book receive-------------  // if you wanted the book, take it
         else if (inputByLine[5].find("has") != std::string::npos) {
             pos = inputByLine[5].find(" ");
-            string loner = inputByLine[5].substr(0, pos - 1);
+            string loner = inputByLine[5].substr(0, pos );
             string bookname = inputByLine[5].substr(pos + 5);
             pos = inputByLine[3].find(":");        // [3] in destination topic
             std::string topic = inputByLine[3].substr(pos + 1);
@@ -376,7 +376,7 @@ void ConnectionHandler::stompReceivedProcess(std::string &income) {
                 std::stringstream ss;
                 ss << "SEND\n" <<
                    "destination:" + topic + "\n\n" <<
-                   "Taking " + bookname + " from " + user->getName() <<
+                   "Taking " + bookname + " from " + loner <<
                    "\n^@";
                 std::string frame = ss.str();
                 sendFrame(frame); //ENCODER                              //Sending that the user has the book

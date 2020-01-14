@@ -10,6 +10,7 @@
 #include <iostream>
 #include "User.h"
 #include <boost/asio.hpp>
+#include <mutex>
 
 using boost::asio::ip::tcp;
 

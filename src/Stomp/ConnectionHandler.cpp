@@ -159,6 +159,7 @@ void ConnectionHandler::stompSendProcess(std::string &input) {
             registered = true;
             logout = false;                                                // thread will start to run - global variable
             user->setName(inputBySpace[2]);                         // [2] is the user name
+            //TODO: move this set name to after receiving "connected"
             std::stringstream ss;
             ss << "CONNECT\n" <<
             "accept-version:1.2\n" <<
@@ -443,7 +444,7 @@ void ConnectionHandler::stompReceivedProcess(std::string &income) {
                 if (book->getTopic() == topic)
                     booksList = booksList + book->getBookname() + ",";
             }
-            booksList = booksList.substr(0, booksList.length() - 2);    //To delete the last ","
+            booksList = booksList.substr(0, booksList.length() - 1);    //To delete the last ","
             std::cout<< topic+": "+inputByLine[5]+"\n";                 //Printing to the screen {topic}:{content}
 
             std::stringstream ss;

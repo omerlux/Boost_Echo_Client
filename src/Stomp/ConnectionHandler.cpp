@@ -162,7 +162,7 @@ void ConnectionHandler::stompSendProcess(std::string &input) {
             registered = true;
             logout = false;                                                // thread will start to run - global variable
             oldUser=inputBySpace[2];                                      //olduser = this username that was entered - will be used when connected
-                    //user->setName(inputBySpace[2]);                //move this set name to after receiving "connected"
+                    //user->setName(inputBySpace[2]); //move this set name to after receiving "connected"
             std::stringstream ss;
             ss << "CONNECT\n" <<
             "accept-version:1.2\n" <<

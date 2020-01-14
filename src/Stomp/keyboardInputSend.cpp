@@ -6,6 +6,7 @@
 
 extern bool do_shutdown;
 extern bool logout;
+extern bool first_login;
 extern std::string last_input;
 
 keyboardInputSend::keyboardInputSend(int id, ConnectionHandler& CH):id(id), CH(CH){}
@@ -31,6 +32,8 @@ void keyboardInputSend::run(){
         }else if(logout & input.find("login")!= std::string::npos){     //user wants to log in again
             ///----------login again - rerun threads proccess------
             last_input=input;
+            logout=false;       //for making the socketReader, to run on the while
+            first_login =false; //for making the socketReader NOT read the socket until we are logged in again
             break;              //close the run loop - make the thread join
         }
     }

@@ -28,7 +28,6 @@ int main (int argc, char *argv[]) {
 
         socketReader_thread.join();
         keyboardIS_thread.join();
-
     }
 
     delete user;

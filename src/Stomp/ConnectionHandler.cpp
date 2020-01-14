@@ -177,16 +177,17 @@ void ConnectionHandler::stompSendProcess(std::string &input) {
     }else if(first_word == "join"){
         string topic = inputBySpace[1];                                     // [1] is the topic name
         int topicId = user->subTopic(topic);
-        int receiptId = user->addReceiptId("join "+topic);          //The user subscribe to topic
+        if(topicId!=-1) {
+            int receiptId = user->addReceiptId("join " + topic);          //The user subscribe to topic
 
-        std::stringstream ss2;
-        ss2 << "SUBSCRIBE\n" <<
-           "destination:"+topic+"\n" <<
-           "id:"+std::to_string(topicId)+"\n" <<
-           "receipt:"+std::to_string(receiptId)+"\n\n^@";
-        std::string frame = ss2.str();
-        sendFrame(frame); //ENCODER
-
+            std::stringstream ss2;
+            ss2 << "SUBSCRIBE\n" <<
+                "destination:" + topic + "\n" <<
+                "id:" + std::to_string(topicId) + "\n" <<
+                "receipt:" + std::to_string(receiptId) + "\n\n^@";
+            std::string frame = ss2.str();
+            sendFrame(frame); //ENCODER
+        }
 
     ///------------------------Exit send----------------------------------------------------
     }else if(first_word == "exit"){
@@ -209,15 +210,28 @@ void ConnectionHandler::stompSendProcess(std::string &input) {
         string bookname = inputBySpace[2];
         for (int i=3; i<inputBySpace.size();i++)
             bookname += " "+inputBySpace[i];
-        Book* new_book = new Book(bookname,inputBySpace[1],user->getName()); //creating new book with no loners - default is username
-        user->addBook(new_book);
+        bool alreadyExists=false;
+        for(Book* b : user->getInventory()){
+            if(b->getBookname()==bookname){
+                alreadyExists=true;
+                break;
+            }
+        }
+        if(!alreadyExists) {
+            Book *new_book = new Book(bookname, inputBySpace[1],
+                                      user->getName()); //creating new book with no loners - default is username
+            user->addBook(new_book);
 
-        std::stringstream ss;
-        ss << "SEND\n" <<
-            "destination:"+inputBySpace[1]+"\n\n" <<                              // [1] is the topic name
-            user->getName()+" has added the book "+bookname+"\n^@";    // [2] is the book name
-        std::string frame = ss.str();
-        sendFrame(frame); //ENCODER
+            std::stringstream ss;
+            ss << "SEND\n" <<
+               "destination:" + inputBySpace[1] + "\n\n" <<                              // [1] is the topic name
+               user->getName() + " has added the book " + bookname + "\n^@";    // [2] is the book name
+            std::string frame = ss.str();
+            sendFrame(frame); //ENCODER
+        }
+        else{
+            cout<<"Already have that book\n";
+        }
 
      ///------------------------Borrow send----------------------------------------------------
     }else if(first_word == "borrow"){
@@ -241,9 +255,9 @@ void ConnectionHandler::stompSendProcess(std::string &input) {
 
         string loner="";
         for(Book* book: user->getInventory()){                  // searching for the book we want to return
-            if(book->getBookname() == bookname) {        // [2] is the book name
+            if(book->getBookname() == bookname) {               // [2] is the book name
                 loner = book->getLoner();                       // if loner is real name, than we will delete the book and send the frame
-                if(loner != "") {
+                if(loner!=user->getName()) {                    // loner is the user, only if its not loaned
                     user->getInventory().erase(
                             std::remove(user->getInventory().begin(), user->getInventory().end(), book));
                     delete book;
@@ -445,7 +459,7 @@ void ConnectionHandler::stompReceivedProcess(std::string &income) {
             std::string topic = inputByLine[3].substr(pos + 1);
             std::string booksList;
             for (Book *book: user->getInventory()) {
-                if (book->getTopic() == topic)
+                if (book->getTopic() == topic & book->getInMyInventory())       //the book is in this genre and in my inventory
                     booksList = booksList + book->getBookname() + ",";
             }
             booksList = booksList.substr(0, booksList.length() - 1);    //To delete the last ","

@@ -73,7 +73,7 @@ int User::subTopic(string &topic) {
         topicIdCounter++;
         return topicIdCounter - 1;                                           //returning the number of that topic
     } else {                    //already exists
-        return topic_idByClient_map.find(topic)->second;            ///if we send this to the server, nothin will happen
+        return -1;              //return -1 if we already in this topic
     }
     //------------------- end edit 11/1 --------------------------
 }

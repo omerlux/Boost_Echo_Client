@@ -5,6 +5,7 @@
 #include "ConnectionHandler.h"
 #include <string>
 #include <boost/lexical_cast.hpp>// for lexical_cast()
+#include <mutex>
 
 using boost::asio::ip::tcp;
 
